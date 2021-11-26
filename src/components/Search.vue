@@ -1,31 +1,33 @@
 <template>
   <div class="container">
     <div class="container">
-      <!-- <label for="input-with-list">Type to search</label> -->
       <b-form-input
+        type="search"
+        autofocus
         placeholder="Type to search"
-        class="container"
         v-model="query"
-        @keypress.enter="handleSearch"
+        @keypress.enter="handleSubmit"
         list="input-list"
         id="input-with-list"
       ></b-form-input>
-      <!-- <b-form-datalist id="input-list" :options="results"></b-form-datalist> -->
-    </div>
-    <div class="container my-3">
-      <b-list-group v-for="result in results" :key="result.question_id">
-        <ListItem :result="result" />
-        <!-- <a :href="result.link"
-          ><b-list-group-item v-on:mouseover="active = !active">{{ result.title }}</b-list-group-item></a
-        > -->
 
-        <!-- <b-list-group-item active>Dapibus ac facilisis in</b-list-group-item>
-        <b-list-group-item>Morbi leo risus</b-list-group-item>
-        <b-list-group-item>Porta ac consectetur ac</b-list-group-item>
-        <b-list-group-item>Vestibulum at eros</b-list-group-item> -->
+      <!-- <b-list-group v-show="showSuggestions" v-for="result in results" :key="result.question_id">
+        <b-link @click="() => handleSelectAutocompleteOption(result.name)">
+          <b-list-group-item>{{ result.name }}</b-list-group-item></b-link
+        >
+      </b-list-group> -->
+      <Autocomplete v-for="result in results" :key="result.question_id" :result="result.name" />
+    </div>
+
+    <div class="container my-3">
+      <b-list-group v-for="result in finalResults" :key="result.question_id">
+        <ListItem :result="result" />
       </b-list-group>
     </div>
-    <b-link @click="handleLoadMore" href="#foo">Load more...</b-link>
+
+    <button class="btn text-primary text-bold" v-show="finalResults.length" @click="handleLoadMore">
+      Load more...
+    </button>
   </div>
 </template>
 
@@ -33,65 +35,74 @@
 import axios from 'axios'
 import { BASE_URL } from '../config/constants'
 import ListItem from './ListItem.vue'
-// import debouce from 'lodash.debounce'
+import debounce from 'lodash.debounce'
+import Autocomplete from './Autocomplete'
 // import { getSearchResults } from '../api'
 
 export default {
   name: 'Search',
   components: {
     ListItem,
+    Autocomplete,
   },
   data() {
     return {
-      results: null,
+      results: [],
+      finalResults: [],
       query: '',
       loading: false,
       page: 1,
+      tag: '',
+      showSuggestions: false,
     }
   },
 
   watch: {
-    // whenever question changes, this function will run
     query: function () {
-      console.log(this.query)
-      // this.debouncedGetAnswer()
-      // this.answer = 'Waiting for you to stop typing...'
-      // this.debouncedGetAnswer()
+      !this.tag.length && (this.showSuggestions = true)
+      this.query.length && this.debouncedGetQuestions()
     },
     page: function () {
-      console.log('whatchinfg')
-      this.handleSearch()
+      // this.handleSearch(this.tag)
     },
   },
-
   created: function () {
-    this.handleSeach()
-    // this.debouncedGetAnswer = debouce(getAutoCompleteResults(this.query), 500)
+    this.debouncedGetQuestions = debounce(this.handleAutocomplete, 500)
   },
   mounted() {},
   methods: {
-    fetchSugestions() {
+    handleAutocomplete() {
       axios
-        .get(`${BASE_URL}inname=${this.autocompleteQuery}&tagged=${this.tag}`)
-        .then((response) => (this.response = response.data.items.map((item) => item.title)))
-        .catch((error) => console.error(error))
-        .finally(() => console.log('FINALLY'))
-    },
-    handleSearch() {
-      this.loading = true
-      axios
-        .get(`${BASE_URL}&tagged=${this.query}&${this.page}`)
-        // .then((response) => (this.response = response.data.items.map((item) => item.title)))
+        .get(`${BASE_URL}tags?order=desc&sort=popular&site=stackoverflow&inname=${this.query}`)
         .then((response) => (this.results = response.data.items))
         .catch((error) => console.error(error))
         .finally(() => console.log('FINALLY'))
-      this.loading = false
-      // this.query = ''
+    },
+    handleSearch(term) {
+      axios
+        .get(
+          `${BASE_URL}questions/unanswered?pagesize=5&order=desc&sort=activity&site=stackoverflow&tagged=${term}&${this.page}`
+        )
+        .then((response) => (this.finalResults = response.data.items))
+        .catch((error) => console.error(error))
+        .finally(() => console.log('FINALLY'))
+      this.query = ''
     },
     handleLoadMore() {
       this.page++
+      this.handleSearch(this.tag)
+    },
+    handleSubmit() {
+      this.tag = this.query
+      this.handleSearch(this.query)
+      this.showSuggetions = false
+    },
+    handleSelectAutocompleteOption(name) {
+      this.tag = name
+      this.showSuggestions = false
+      this.handleSearch(name)
       this.query = ''
-      // this.handleSearch()
+      this.results = []
     },
   },
 }
