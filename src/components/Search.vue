@@ -1,15 +1,21 @@
 <template>
   <div class="container">
     <div class="container">
-      <b-form-input
-        type="search"
-        autofocus
-        placeholder="Type to search"
-        v-model="query"
-        @keypress.enter="handleSubmit"
-        list="input-list"
-        id="input-with-list"
-      ></b-form-input>
+      <div class="d-flex">
+        <b-form-input
+          ref="input"
+          class="mx-2"
+          type="search"
+          autofocus
+          placeholder="Type to search"
+          v-model="query"
+          @keypress.enter="handleSubmit"
+          list="input-list"
+          id="input-with-list"
+        ></b-form-input>
+        <b-button ref="search" @click="handleSubmit" variant="primary" class="my-1">Search</b-button>
+        <b-button ref="clear" @click="handleClearSearch" variant="danger" class="m-1">Clear</b-button>
+      </div>
 
       <b-list-group v-show="showSuggestions" v-for="result in results" :key="result.question_id">
         <b-link class="text-decoration-none" @click="() => handleSelectAutocompleteOption(result.name)">
@@ -100,6 +106,7 @@ export default {
       this.handleSearch(this.query)
       this.results = []
       this.query = ''
+      this.$refs.search.blur()
     },
     handleSelectAutocompleteOption(name) {
       this.tag = name
@@ -108,9 +115,14 @@ export default {
       this.query = ''
       this.results = []
     },
+    handleClearSearch() {
+      this.$refs.clear.blur()
+      this.finalResults = []
+    },
   },
   updated() {
     console.log('UPDATED')
+    // this.$refs.input.focus()
   },
 }
 </script>
