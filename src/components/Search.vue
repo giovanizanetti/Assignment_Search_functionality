@@ -11,12 +11,12 @@
         id="input-with-list"
       ></b-form-input>
 
-      <!-- <b-list-group v-show="showSuggestions" v-for="result in results" :key="result.question_id">
-        <b-link @click="() => handleSelectAutocompleteOption(result.name)">
-          <b-list-group-item>{{ result.name }}</b-list-group-item></b-link
+      <b-list-group v-show="showSuggestions" v-for="result in results" :key="result.question_id">
+        <b-link class="text-decoration-none" @click="() => handleSelectAutocompleteOption(result.name)">
+          <b-list-group-item class="d-flex px-4 bg-dark text-light">{{ result.name }}</b-list-group-item></b-link
         >
-      </b-list-group> -->
-      <Autocomplete v-for="result in results" :key="result.question_id" :result="result.name" />
+      </b-list-group>
+      <!-- <Autocomplete v-for="result in results" :key="result.question_id" :result="result.name" /> -->
     </div>
 
     <div class="container my-3">
@@ -36,14 +36,14 @@ import axios from 'axios'
 import { BASE_URL } from '../config/constants'
 import ListItem from './ListItem.vue'
 import debounce from 'lodash.debounce'
-import Autocomplete from './Autocomplete'
+// import Autocomplete from './Autocomplete'
 // import { getSearchResults } from '../api'
 
 export default {
   name: 'Search',
   components: {
     ListItem,
-    Autocomplete,
+    // Autocomplete,
   },
   data() {
     return {
@@ -53,27 +53,29 @@ export default {
       loading: false,
       page: 1,
       tag: '',
-      showSuggestions: false,
+      showSuggestions: true,
     }
   },
 
   watch: {
     query: function () {
-      !this.tag.length && (this.showSuggestions = true)
+      this.query.length && (this.showSuggestions = true)
       this.query.length && this.debouncedGetQuestions()
     },
-    page: function () {
-      // this.handleSearch(this.tag)
+    tag: function () {
+      this.results = []
     },
   },
   created: function () {
     this.debouncedGetQuestions = debounce(this.handleAutocomplete, 500)
   },
-  mounted() {},
+  mounted() {
+    console.log('MOUNTED')
+  },
   methods: {
     handleAutocomplete() {
       axios
-        .get(`${BASE_URL}tags?order=desc&sort=popular&site=stackoverflow&inname=${this.query}`)
+        .get(`${BASE_URL}tags?pagesize=10&order=desc&sort=popular&site=stackoverflow&inname=${this.query}`)
         .then((response) => (this.results = response.data.items))
         .catch((error) => console.error(error))
         .finally(() => console.log('FINALLY'))
@@ -81,9 +83,9 @@ export default {
     handleSearch(term) {
       axios
         .get(
-          `${BASE_URL}questions/unanswered?pagesize=5&order=desc&sort=activity&site=stackoverflow&tagged=${term}&${this.page}`
+          `${BASE_URL}questions/unanswered?pagesize=5&order=desc&sort=activity&site=stackoverflow&tagged=${term}&page=${this.page}`
         )
-        .then((response) => (this.finalResults = response.data.items))
+        .then((response) => (this.finalResults = [...this.finalResults, ...response.data.items]))
         .catch((error) => console.error(error))
         .finally(() => console.log('FINALLY'))
       this.query = ''
@@ -93,9 +95,11 @@ export default {
       this.handleSearch(this.tag)
     },
     handleSubmit() {
+      this.showSuggetions = false
       this.tag = this.query
       this.handleSearch(this.query)
-      this.showSuggetions = false
+      this.results = []
+      this.query = ''
     },
     handleSelectAutocompleteOption(name) {
       this.tag = name
@@ -105,7 +109,8 @@ export default {
       this.results = []
     },
   },
+  updated() {
+    console.log('UPDATED')
+  },
 }
 </script>
-
-<style></style>
