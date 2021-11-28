@@ -15,7 +15,6 @@
             class="mx-2"
             :src="result.owner.profile_image"
           ></b-avatar>
-          <!-- <img :src="result.owner.profile_image" /> -->
           <span class="m-2 mr-auto">{{ result.owner.display_name }}</span>
         </div>
         <div class="px-2">{{ getDate(result.creation_date) }}</div>
