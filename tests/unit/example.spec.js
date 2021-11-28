@@ -1,12 +1,27 @@
 import { shallowMount } from "@vue/test-utils";
-import HelloWorld from "@/components/HelloWorld.vue";
+import Home from "@/views/Home.vue";
+import Search from "@/components/Search.vue";
+import Autocomplete from "@/components/Autocomplete.vue";
 
 describe("HelloWorld.vue", () => {
-  it("renders props.msg when passed", () => {
-    const msg = "new message";
-    const wrapper = shallowMount(HelloWorld, {
-      propsData: { msg },
+  describe("Home page", () => {
+    it("renders without creashing", () => {
+      const homeView = shallowMount(Home);
+      expect(homeView).toBeTruthy();
     });
-    expect(wrapper.text()).toMatch(msg);
+  });
+
+  describe("Search component", () => {
+    it("renders without crashing", () => {
+      const searchComponent = shallowMount(Search);
+      expect(searchComponent).toBeTruthy();
+    });
+  });
+
+  describe("Autocomplete component", () => {
+    it("renders without crashing", () => {
+      const autocomplete = shallowMount(Autocomplete);
+      expect(autocomplete).toBeTruthy();
+    });
   });
 });
