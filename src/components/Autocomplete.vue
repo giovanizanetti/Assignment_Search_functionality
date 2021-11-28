@@ -16,6 +16,11 @@
 <script>
 export default {
   name: "Autocomplete",
-  props: ["results"],
+  props: {
+    results: {
+      type: Array,
+      required: true,
+    },
+  },
 };
 </script>

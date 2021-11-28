@@ -21,6 +21,7 @@ describe("HelloWorld.vue", () => {
   describe("Autocomplete component", () => {
     it("renders without crashing", () => {
       const autocomplete = shallowMount(Autocomplete);
+      console.log(Autocomplete);
       expect(autocomplete).toBeTruthy();
     });
   });

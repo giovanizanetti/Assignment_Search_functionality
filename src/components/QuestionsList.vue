@@ -15,6 +15,11 @@ export default {
   components: {
     ListItem,
   },
-  props: ["results"],
+  props: {
+    results: {
+      type: Array,
+      required: true,
+    },
+  },
 };
 </script>

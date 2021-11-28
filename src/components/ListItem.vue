@@ -28,7 +28,12 @@
 import { getDate } from "../helpers";
 export default {
   name: "ListItem",
-  props: ["result"],
+  props: {
+    result: {
+      type: Object,
+      required: true,
+    },
+  },
   data() {
     return {
       active: false,
