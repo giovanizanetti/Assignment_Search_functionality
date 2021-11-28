@@ -1,13 +1,16 @@
 <template>
-  <b-list-group>
-    <b-link @click="() => handleSelectAutocompleteOption(result.name)">
-      <b-list-group-item>{{ result.name }}</b-list-group-item></b-link
-    >
-  </b-list-group>
+  <div>
+    <b-list-group v-for="result in results" :key="result.question_id">
+      <b-link class="text-decoration-none" @click="$emit('select', result.name)">
+        <b-list-group-item class="d-flex px-4 bg-dark text-light">{{ result.name }}</b-list-group-item></b-link
+      >
+    </b-list-group>
+  </div>
 </template>
 
 <script>
 export default {
-  props: ['result'],
+  name: 'Autocomplete',
+  props: ['results'],
 }
 </script>

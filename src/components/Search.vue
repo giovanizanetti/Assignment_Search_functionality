@@ -4,7 +4,7 @@
       <div class="d-flex">
         <b-form-input
           ref="input"
-          class="mx-2"
+          class="mx-2 my-1"
           type="search"
           autofocus
           placeholder="Type to search"
@@ -16,20 +16,10 @@
         <b-button ref="search" @click="handleSubmit" variant="primary" class="my-1">Search</b-button>
         <b-button ref="clear" @click="handleClearSearch" variant="danger" class="m-1">Clear</b-button>
       </div>
-
-      <b-list-group v-show="showSuggestions" v-for="result in results" :key="result.question_id">
-        <b-link class="text-decoration-none" @click="() => handleSelectAutocompleteOption(result.name)">
-          <b-list-group-item class="d-flex px-4 bg-dark text-light">{{ result.name }}</b-list-group-item></b-link
-        >
-      </b-list-group>
-      <!-- <Autocomplete v-for="result in results" :key="result.question_id" :result="result.name" /> -->
+      <Autocomplete v-show="showSuggestions" :results="results" @select="handleSelectAutocompleteOption" />
     </div>
 
-    <div class="container my-3">
-      <b-list-group v-for="result in finalResults" :key="result.question_id">
-        <ListItem :result="result" />
-      </b-list-group>
-    </div>
+    <QuestionsList :finalResults="finalResults" />
 
     <button class="btn text-primary text-bold" v-show="finalResults.length" @click="handleLoadMore">
       Load more...
@@ -40,16 +30,15 @@
 <script>
 import axios from 'axios'
 import { BASE_URL } from '../config/constants'
-import ListItem from './ListItem.vue'
 import debounce from 'lodash.debounce'
-// import Autocomplete from './Autocomplete'
-// import { getSearchResults } from '../api'
+import Autocomplete from './Autocomplete'
+import QuestionsList from './QuestionsList'
 
 export default {
   name: 'Search',
   components: {
-    ListItem,
-    // Autocomplete,
+    Autocomplete,
+    QuestionsList,
   },
   data() {
     return {
@@ -122,7 +111,6 @@ export default {
   },
   updated() {
     console.log('UPDATED')
-    // this.$refs.input.focus()
   },
 }
 </script>
