@@ -12,11 +12,15 @@
           @keypress.enter="handleSubmit"
           list="input-list"
           id="input-with-list"
-        ></b-form-input>
+        />
+
         <b-button ref="search" @click="handleSubmit" variant="primary" class="my-1">Search</b-button>
         <b-button ref="clear" @click="handleClearSearch" variant="danger" class="m-1">Clear</b-button>
       </div>
-      <Autocomplete v-show="showSuggestions" :results="results" @select="handleSelectAutocompleteOption" />
+      <div class="d-flex flex-column">
+        <span v-if="!results.length && query.length" class="mx-5 align-self-start">...Loading</span>
+        <Autocomplete v-show="showSuggestions" :results="results" @select="handleSelectAutocompleteOption" />
+      </div>
     </div>
 
     <QuestionsList :finalResults="finalResults" />
@@ -28,11 +32,12 @@
 </template>
 
 <script>
-import axios from 'axios'
-import { BASE_URL } from '../config/constants'
+// import axios from 'axios'
+// import { BASE_URL } from '../config/constants'
 import debounce from 'lodash.debounce'
 import Autocomplete from './Autocomplete'
 import QuestionsList from './QuestionsList'
+import { fetchSearchResults, fetchAutocompleteResults } from '../api'
 
 export default {
   name: 'Search',
@@ -64,26 +69,16 @@ export default {
   created: function () {
     this.debouncedGetQuestions = debounce(this.handleAutocomplete, 500)
   },
-  mounted() {
-    console.log('MOUNTED')
-  },
   methods: {
-    handleAutocomplete() {
-      axios
-        .get(`${BASE_URL}tags?pagesize=10&order=desc&sort=popular&site=stackoverflow&inname=${this.query}`)
-        .then((response) => (this.results = response.data.items))
-        .catch((error) => console.error(error))
-        .finally(() => console.log('FINALLY'))
+    async handleAutocomplete() {
+      const response = await fetchAutocompleteResults(this.query)
+      this.results = response
     },
-    handleSearch(term) {
-      axios
-        .get(
-          `${BASE_URL}questions/unanswered?pagesize=5&order=desc&sort=activity&site=stackoverflow&tagged=${term}&page=${this.page}`
-        )
-        .then((response) => (this.finalResults = [...this.finalResults, ...response.data.items]))
-        .catch((error) => console.error(error))
-        .finally(() => console.log('FINALLY'))
+    async handleSearch(term) {
+      const response = await fetchSearchResults(term, this.page)
+      this.finalResults = [...this.finalResults, ...response]
       this.query = ''
+      this.showSuggestions = false
     },
     handleLoadMore() {
       this.page++
@@ -107,6 +102,7 @@ export default {
     handleClearSearch() {
       this.$refs.clear.blur()
       this.finalResults = []
+      this.showSuggestions = false
     },
   },
   updated() {
