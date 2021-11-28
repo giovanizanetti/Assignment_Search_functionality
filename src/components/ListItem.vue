@@ -1,10 +1,20 @@
 <template>
   <b-link :href="result.link">
-    <b-list-group-item class="pb-0 m-2" @mouseover="active = true" @mouseleave="active = false" :active="active">
+    <b-list-group-item
+      class="pb-0 m-2"
+      @mouseover="active = true"
+      @mouseleave="active = false"
+      :active="active"
+    >
       <strong>{{ result.title }}</strong>
       <div class="d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center py-2">
-          <b-avatar size="sm" variant="info" class="mx-2" :src="result.owner.profile_image"></b-avatar>
+          <b-avatar
+            size="sm"
+            variant="info"
+            class="mx-2"
+            :src="result.owner.profile_image"
+          ></b-avatar>
           <!-- <img :src="result.owner.profile_image" /> -->
           <span class="m-2 mr-auto">{{ result.owner.display_name }}</span>
         </div>
@@ -15,26 +25,17 @@
 </template>
 
 <script>
-import { getDate } from '../helpers'
+import { getDate } from "../helpers";
 export default {
-  name: 'ListItem',
-  props: ['result'],
+  name: "ListItem",
+  props: ["result"],
   data() {
     return {
       active: false,
-      // results: null,
-      // query: '',
-      // loading: false,
-    }
-  },
-  mounted() {
-    console.log(getDate(this.result.creation_date))
+    };
   },
   methods: {
     getDate,
   },
-}
+};
 </script>
-
-<style></style>
-*/}

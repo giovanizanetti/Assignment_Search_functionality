@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="container my-3">
-      <b-list-group v-for="result in finalResults" :key="result.question_id">
+      <b-list-group v-for="result in results" :key="result.question_id">
         <ListItem :result="result" />
       </b-list-group>
     </div>
@@ -9,12 +9,12 @@
 </template>
 
 <script>
-import ListItem from './ListItem'
+import ListItem from "./ListItem";
 export default {
-  name: 'QuestionsList',
+  name: "QuestionsList",
   components: {
     ListItem,
   },
-  props: ['finalResults'],
-}
+  props: ["results"],
+};
 </script>
