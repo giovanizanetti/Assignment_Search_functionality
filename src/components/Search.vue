@@ -65,9 +65,14 @@ export default {
     tag: function () {
       this.autocompleteResults = [];
     },
+    finalResults() {
+      localStorage.setItem("questions", JSON.stringify(this.finalResults));
+    },
   },
   created: function () {
     this.debouncedGetQuestions = debounce(this.handleAutocomplete, 500);
+    localStorage.questions &&
+      (this.finalResults = JSON.parse(localStorage.questions));
   },
   methods: {
     async handleAutocomplete() {

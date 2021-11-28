@@ -1,7 +1,7 @@
 import { shallowMount } from "@vue/test-utils";
-import Home from "@/views/Home.vue";
-import Search from "@/components/Search.vue";
-import Autocomplete from "@/components/Autocomplete.vue";
+import Home from "@/views/Home";
+import Search from "@/components/Search";
+import Autocomplete from "@/components/Autocomplete";
 
 describe("HelloWorld.vue", () => {
   describe("Home page", () => {
@@ -20,7 +20,25 @@ describe("HelloWorld.vue", () => {
 
   describe("Autocomplete component", () => {
     it("renders without crashing", () => {
-      const autocomplete = shallowMount(Autocomplete);
+      const results = [
+        {
+          has_synonyms: true,
+          is_moderator_only: false,
+          is_required: false,
+          count: 1355753,
+          name: "android",
+        },
+        {
+          has_synonyms: true,
+          is_moderator_only: false,
+          is_required: false,
+          count: 409720,
+          name: "node.js",
+        },
+      ];
+      const autocomplete = shallowMount(Autocomplete, {
+        propsData: { results },
+      });
       console.log(Autocomplete);
       expect(autocomplete).toBeTruthy();
     });
